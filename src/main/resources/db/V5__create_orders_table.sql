@@ -1,0 +1,4 @@
+CREATE TABLE  orders(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_number VARCHAR(50)
+);
