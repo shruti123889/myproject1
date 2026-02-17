@@ -28,12 +28,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        System.out.println("JWT FILTER PATH => " + path);
-
-        return path.startsWith("/auth/")
-                || path.equals("/test-encode");
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        // In paths par filter kaam nahi karega
+        return path.startsWith("/auth/") || path.startsWith("/orders") || path.equals("/test-encode");
     }
 
     @Override
