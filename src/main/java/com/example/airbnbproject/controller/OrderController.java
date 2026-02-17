@@ -3,12 +3,15 @@ import com.example.airbnbproject.entity.Order;
 import com.example.airbnbproject.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import com.example.airbnbproject.dto.OrderRequestDTO;
 import com.example.airbnbproject.dto.OrderResponseDTO;
+import java.util.ArrayList;
 import java.util.Optional;
 import com.example.airbnbproject.exception.OrderNotFoundException;
 import com.example.airbnbproject.dto.OrderRequestDTO;
@@ -45,6 +48,9 @@ public class OrderController {
         return ResponseEntity.ok("Order deleted successfully");
     }
 
-
+    @GetMapping
+    public List<String> testGet() {
+        return Arrays.asList("Order1", "Order2");
+    }
 
 }
