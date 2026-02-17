@@ -30,8 +30,11 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        // In paths par filter kaam nahi karega
-        return path.startsWith("/auth/") || path.startsWith("/orders") || path.equals("/test-encode");
+        // In paths par JWT validation bypass ho jayegi
+        return path.startsWith("/auth/") ||
+                path.equals("/orders") ||
+                path.startsWith("/orders/") ||
+                path.equals("/test-encode");
     }
 
     @Override
