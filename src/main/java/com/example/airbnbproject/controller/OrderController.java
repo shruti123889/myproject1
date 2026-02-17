@@ -48,7 +48,7 @@ public class OrderController {
         return ResponseEntity.ok("Order deleted successfully");
     }
 
-    @GetMapping
+    @GetMapping("/test")
     public List<String> testGet() {
         return Arrays.asList("Order1", "Order2");
     }
