@@ -24,21 +24,22 @@ public class SecurityConfig {
 
     @Autowired
     private JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // CSRF disable
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/test-encode").permitAll()
                         .requestMatchers("/orders/**", "/orders").permitAll()
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
-                ) // <-- Ye bracket dhyan se check karein
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
