@@ -28,24 +28,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Sabse pehle CSRF disable karein (Iske bina POST nahi chalega)
+                // 1. Sabse pehle CSRF ko puri tarah band karein
                 .csrf(csrf -> csrf.disable())
 
-                // 2. CORS disable karein (Testing ke liye)
+                // 2. CORS ko bhi band rakhein testing ke liye
                 .cors(cors -> cors.disable())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/test-encode").permitAll()
-                        // Yahan ensure karein ki path sahi hai
-                        .requestMatchers("/orders/**", "/orders").permitAll()
+                        .requestMatchers("/orders/**", "/orders").permitAll() // Dono patterns allow karein
                         .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
-                )
+                );
 
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        // Agar aap JWT use kar rahe hain toh filter add karein
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
