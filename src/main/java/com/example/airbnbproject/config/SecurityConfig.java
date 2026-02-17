@@ -24,30 +24,21 @@ public class SecurityConfig {
 
     @Autowired
     private JwtFilter jwtFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // CSRF ko disable rakhein taaki POST requests block na hon
+        http.csrf(csrf -> csrf.disable()) // CSRF disable
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Auth aur Test endpoints ko allow karein
                         .requestMatchers("/auth/**", "/test-encode").permitAll()
-
-                        // 2. Orders ko sabke liye allow karein (Isse 403 Forbidden hat jayega)
                         .requestMatchers("/orders/**", "/orders").permitAll()
-
-                        // 3. Products ke liye sirf ADMIN allow karein
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
-
-                        // 4. Baaki sabhi requests ke liye authentication zaroori hai
                         .anyRequest().authenticated()
-                )
-                // Session ko STATELESS rakhein kyunki hum JWT use kar rahe hain
+                ) // <-- Ye bracket dhyan se check karein
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // JWT Filter ko UsernamePasswordAuthenticationFilter se pehle lagayein
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
