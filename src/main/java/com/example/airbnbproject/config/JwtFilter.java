@@ -1,71 +1,65 @@
 package com.example.airbnbproject.config;
 
-import com.example.airbnbproject.service.impl.CustomUserDetailsService;
 import com.example.airbnbproject.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import io.jsonwebtoken.Claims;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.List;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+
+    // 1. Sahi Variable Declaration (Type + Name)
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+
+    // 2. Sahi Constructor Injection
+    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        // In paths par filter ko bypass karne ke liye ye logic best hai
-        return path.equals("/orders") ||
+        // Auth aur Test endpoints ko skip karne ke liye
+        return path.startsWith("/auth/") ||
                 path.startsWith("/orders/") ||
-                path.startsWith("/auth/") ||
                 path.equals("/test-encode");
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-
-            String username = jwtUtil.extractUsername(token);
-            String role = jwtUtil.extractRole(token); // ROLE_ADMIN
-
-            List<GrantedAuthority> authorities =
-                    List.of(new SimpleGrantedAuthority(role));
-
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            authorities
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            jwt = authHeader.substring(7);
+            username = jwtUtil.extractUsername(jwt);
         }
 
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            // 3. validateToken ab red line nahi dikhayega
+            if (jwtUtil.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
         filterChain.doFilter(request, response);
-
     }
-
-   }
+}

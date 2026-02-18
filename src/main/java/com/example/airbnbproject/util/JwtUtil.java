@@ -40,4 +40,15 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // Ye method validateToken ka error khatam kar dega
+    public Boolean validateToken(String token, org.springframework.security.core.userdetails.UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    // Token expiry check karne ke liye helper method
+    private Boolean isTokenExpired(String token) {
+        return getClaims(token).getExpiration().before(new java.util.Date());
+    }
 }
