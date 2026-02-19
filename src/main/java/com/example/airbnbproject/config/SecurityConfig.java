@@ -31,8 +31,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/test-encode").permitAll()
-                        .requestMatchers("/orders/**", "/orders").permitAll()
+                        .requestMatchers("/auth/*", "/test/*").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/orders/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").authenticated()
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
