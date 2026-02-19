@@ -27,17 +27,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        http.csrf(csrf -> csrf.disable()) // POST request enable karne ke liye CSRF disable karna zaroori hai
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT ke liye stateless session
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Sabke liye open (Bina Token ke chalega)
                         .requestMatchers("/auth/*", "/test/*").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/orders/**").permitAll()
+
+                        // 2. Sirf Valid Token ke liye (POST yahan se allow hoga)
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").authenticated()
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
+
+                        // 3. Baaki sabhi requests ke liye authentication zaroori hai
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // JWT Filter zaroori hai
 
         return http.build();
     }
