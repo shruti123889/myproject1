@@ -36,11 +36,11 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/orders/**").permitAll()
 
                         // 2. Inke liye TOKEN chahiye (Yahan galti thi, ab ye sahi hai)
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").permitAll()
                         .requestMatchers("/products/**").hasAnyAuthority("ROLE_ADMIN")
 
                         // 3. Baaki sab ke liye bhi login zaroori hai
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
