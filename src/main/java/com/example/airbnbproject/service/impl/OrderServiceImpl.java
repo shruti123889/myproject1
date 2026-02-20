@@ -12,7 +12,6 @@ import com.example.airbnbproject.entity.Order;
 import com.example.airbnbproject.entity.OrderItem;
 import com.example.airbnbproject.repository.OrderItemRepository;
 import com.example.airbnbproject.exception.OrderNotFoundException;
-import com.example.airbnbproject.dto.OrderRequestDTO;
 @Service
 public class OrderServiceImpl implements OrderService {
         @Autowired
@@ -68,16 +67,33 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO save(OrderRequestDTO request) {
 
-        if(request.getAmount() <= 0){
+        if (request.getAmount() <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         Order order = new Order();
+        order.setOrderNumber(request.getOrderNumber());
         order.setAmount(request.getAmount());
+        order.setStatus("CREATED");
+
+        List<OrderItem> items = new ArrayList<>();
+
+        for (OrderItemDTO dto : request.getOrderItems()) {
+            OrderItem item = new OrderItem();
+            item.setProductId(dto.getProductId());
+            item.setQuantity(dto.getQuantity());
+            item.setOrder(order);
+            items.add(item);
+        }
+
+        order.setOrderItems(items);
 
         Order savedOrder = orderRepository.save(order);
 
         OrderResponseDTO response = new OrderResponseDTO();
+        response.setId(savedOrder.getId());
+        response.setOrderNumber(savedOrder.getOrderNumber());
+        response.setStatus(savedOrder.getStatus());
         response.setAmount(savedOrder.getAmount());
 
         return response;
