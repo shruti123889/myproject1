@@ -11,30 +11,23 @@ import jakarta.validation.Valid;
 @Entity
 @Table(name= "orders")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name="order_number")
     private String orderNumber;
     private Double amount;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<OrderItem> orderItems = new ArrayList<>();
-
-     public Order(){}
+    public Order(){}
     //getters & setters
-
     public String getOrderNumber() {
         return orderNumber;
     }
-
     public void setOrderNumber(String orderNumber) {
         this.orderNumber = orderNumber;
     }
-
     // getters & setters
     public List<OrderItem> getOrderItems() {
         return orderItems;
@@ -51,14 +44,10 @@ public class Order {
     public void setId(Long id) {
         this.id = id;
     }
-
-
-
     // Getter
     public Double getAmount() {
         return amount;
     }
-
     // Setter
     public void setAmount(Double amount) {
         this.amount = amount;
