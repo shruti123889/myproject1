@@ -30,16 +30,15 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Sabke liye open (GET chal jayega)
-                        .requestMatchers("/auth/*", "/test/*").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/orders/**").permitAll()
-
-                        // 2. Inke liye TOKEN chahiye (Yahan galti thi, ab ye sahi hai)
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").permitAll()
-                        .requestMatchers("/products/**").permitAll()
-
-                        // 3. Baaki sab ke liye bhi login zaroori hai.anyRequest().authenticated()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/products").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").permitAll()
+                        .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -55,6 +54,7 @@ public class SecurityConfig {
     }@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
