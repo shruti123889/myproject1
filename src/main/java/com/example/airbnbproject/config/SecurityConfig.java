@@ -17,7 +17,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 import org.springframework.http.HttpMethod;
-import java.util.ArrayList;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,35 +26,42 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                // 1. CORS ko enable karein aur niche wale bean se connect karein
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http.csrf(csrf -> csrf.disable()) // POST request ke liye ye disable hona zaroori hai
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        // 2. GET requests (Search/Pagination) ko bypass dene ke liye ye line zaroori hai
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
-                        .anyRequest().authenticated()
+                        // 1. Sabke liye open (GET chal jayega)
+                        .requestMatchers("/auth/*", "/test/*").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/orders/**").permitAll()
+
+                        // 2. Inke liye TOKEN chahiye (Yahan galti thi, ab ye sahi hai)
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/orders/**").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+
+                        // 3. Baaki sab ke liye bhi login zaroori hai.anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     @Bean
-    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }@Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setAllowCredentials(false);
 
-        // Arrays.asList ki jagah java.util.List.of use karein (Java 9+ me best hai)
-        configuration.setAllowedOrigins(java.util.List.of("*"));
-        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Accept"));
-        configuration.setExposedHeaders(java.util.List.of("Authorization"));
-
-        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-    }
+}
