@@ -41,6 +41,7 @@ public class SecurityConfig {
                         // 3. Baaki sab ke liye bhi login zaroori hai
                         .anyRequest().authenticated()
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
