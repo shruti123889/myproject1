@@ -28,12 +28,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        // Auth aur Test endpoints ko skip karne ke liye
-        return path.startsWith("/auth/") ||
-                path.startsWith("/orders/") ||
-                path.equals("/test-encode");
+
+        return path.startsWith("/auth/")
+                || path.startsWith("/products/")
+                || path.equals("/products")
+                || path.startsWith("/orders/")
+                || path.equals("/test-encode");
     }
 
     @Override
