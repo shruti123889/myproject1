@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/**").permitAll()
                                 // Products ke saare GET aur POST requests ko allow karein
                                 .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/products/**").permitAll()
+                                //.requestMatchers(HttpMethod.POST, "/products/**").permitAll()
                                 .requestMatchers("/products", "/products/**").permitAll()
                                 .anyRequest().authenticated()
                         )
