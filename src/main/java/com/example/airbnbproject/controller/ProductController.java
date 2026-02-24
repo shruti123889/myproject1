@@ -53,5 +53,8 @@ public class ProductController {
 
         return productService.getProducts(page, size, name);
     }
-
+    @GetMapping("/")
+    public String home() {
+        return "Backend is running successfully 🚀";
+    }
 }
