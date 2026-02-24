@@ -30,11 +30,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/products/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-
+                                .requestMatchers("/auth/**").permitAll()
+                                // Products ke saare GET aur POST requests ko allow karein
+                                .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/products/**").permitAll()
+                                .requestMatchers("/products", "/products/**").permitAll()
+                                .anyRequest().authenticated()
+                        )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
