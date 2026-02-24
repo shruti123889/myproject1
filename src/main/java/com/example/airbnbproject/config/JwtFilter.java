@@ -25,9 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
     public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
-    }
-
-    @Override
+    }@Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
 
