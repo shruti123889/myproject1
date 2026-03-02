@@ -24,17 +24,21 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // POST request ke liye ye disable hona zaroori hai
-                .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        http// 1. CORS apply karein jo niche define kiya hai
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // 2. CSRF disable karein (POST requests ke liye zaroori hai)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/products/**").permitAll()
-                        .requestMatchers("/orders/**").permitAll()
-                        .requestMatchers("/products", "/products/**").permitAll()
+                        // 3. Sabhi public endpoints ek saath rakhein
+                        .requestMatchers("/auth/**", "/customers","/customers/**", "/products/**", "/orders/**", "/sales/**","/accounts/**", "/test-encode").permitAll()
+
                         .anyRequest().authenticated()
-                ).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                )// 4. Session management stateless rakhein
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                // 5. JWT Filter add karein
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     @Bean
@@ -45,13 +49,14 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }@Bean
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
