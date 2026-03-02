@@ -22,25 +22,21 @@ import org.springframework.http.HttpMethod;
 public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http// 1. CORS apply karein jo niche define kiya hai
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // 2. CSRF disable karein (POST requests ke liye zaroori hai)
+        http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 3. Sabhi public endpoints ek saath rakhein
-                        .requestMatchers("/auth/**", "/customers","/customers/**", "/products/**", "/orders/**", "/sales/**","/accounts/**", "/test-encode").permitAll()
-
-                        .anyRequest().authenticated()
-                )// 4. Session management stateless rakhein
+                        .anyRequest().permitAll()           // ← सब कुछ public कर दो 5 मिनट के लिए
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                // 5. JWT Filter add karein
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                );
+
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
