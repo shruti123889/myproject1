@@ -28,7 +28,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()           // ← सब कुछ public कर दो 5 मिनट के लिए
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/orders/**").permitAll()
+                        .requestMatchers("/sales/**").permitAll()
+                        .requestMatchers("/customers/**").permitAll()
+                        .requestMatchers("/accounts/**").permitAll()
+                        .requestMatchers("/test-encode").permitAll()
+                        .anyRequest().authenticated()
+                        // ← सब कुछ public कर दो 5 मिनट के लिए
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
