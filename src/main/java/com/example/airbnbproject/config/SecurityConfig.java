@@ -25,8 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ensure chaining
-                .authorizeHttpRequests(auth -> auth
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth->auth
                         .requestMatchers("/", "/auth/*", "/products", "/products/*").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -46,10 +46,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Frontend origin (127.0.0.1:5500) ko allow karna zaroori hai
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
