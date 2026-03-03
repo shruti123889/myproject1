@@ -14,26 +14,23 @@ import org.springframework.data.domain.Page;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/products")
-public class ProductController {
-    @Autowired
+public class ProductController { @Autowired
     private ProductService productService;
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public Product saveProduct(
             @Valid @RequestBody ProductRequestDto productDto) {
         return productService.save(productDto);}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully");
     }@PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ProductDto updateProduct(
+        public ProductDto updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequestDto productDto) {
         Product product = productService.updateProduct(id, productDto);
         return mapToDto(product);}
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
@@ -50,9 +47,7 @@ public class ProductController {
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam(required = false) String name) {
-
-        return productService.getProducts(page, size, name);
-    }
+        return productService.getProducts(page, size, name);}
     @GetMapping("/")
     public String home() {
         return "Backend is running successfully 🚀";
