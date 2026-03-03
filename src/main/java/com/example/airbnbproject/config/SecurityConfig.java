@@ -25,8 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                // Yeh line ensure karegi ki CORS settings apply hon
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ensure chaining
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/auth/*", "/products", "/products/*").permitAll()
                         .anyRequest().authenticated()
