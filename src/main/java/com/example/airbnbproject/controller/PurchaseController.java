@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/purchase")
 // Origins mein "*" dalne se CORS error khatam ho jayega
@@ -16,19 +19,22 @@ public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
 
-    // Iska full path ab "BASE_URL/purchase/create" hoga
     @PostMapping("/create")
     public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDto request) {
         try {
-            Purchase purchase = purchaseService.createPurchase(
+            Object purchase = purchaseService.createPurchase(
                     request.getProductId(),
-                    1L, // Default Vendor ID
+                    1L,
                     request.getQuantity(),
                     request.getUnitCost()
             );
             return ResponseEntity.ok(purchase);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Plain string ki jagah JSON object bhejein
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
+
 }
