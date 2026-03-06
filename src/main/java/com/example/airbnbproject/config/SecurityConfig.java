@@ -25,9 +25,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/", "/auth/*", "/products", "/products/*").permitAll()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ye change zaroori hai
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/auth/*", "/products", "/products/").permitAll()
+                        // Agar aap chahti hain ki purchase wala endpoint bhi bina login ke chale (testing ke liye):
+                        .requestMatchers("/purchases/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
