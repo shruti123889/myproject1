@@ -8,16 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/purchase") // Frontend ki URL se match karne ke liye change kiya
-@CrossOrigin(origins = "http://127.0.0.1:5500") // CORS Error fix karne ke liye
+@RequestMapping("/purchase")
+// Origins mein "*" dalne se CORS error khatam ho jayega
+@CrossOrigin(origins = "*")
 public class PurchaseController {
 
     @Autowired
     private PurchaseService purchaseService;
+
+    // Iska full path ab "BASE_URL/purchase/create" hoga
     @PostMapping("/create")
-    public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDto request) { // RequestBody use karein
+    public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDto request) {
         try {
-            // request object se data nikalein
             Purchase purchase = purchaseService.createPurchase(
                     request.getProductId(),
                     1L, // Default Vendor ID
@@ -29,5 +31,4 @@ public class PurchaseController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }
