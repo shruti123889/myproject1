@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/purchase/**").permitAll() // Ensure singular 'purchase'
                         .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/stats/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 // JWT filter ko add karna mat bhoolna agar login use kar rahe ho
