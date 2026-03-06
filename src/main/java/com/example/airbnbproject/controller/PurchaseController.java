@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/purchase")
 // Origins mein "*" dalne se CORS error khatam ho jayega
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "", allowedHeaders = "", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class PurchaseController {
 
     @Autowired
