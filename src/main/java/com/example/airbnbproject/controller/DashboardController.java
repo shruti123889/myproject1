@@ -1,12 +1,15 @@
 package com.example.airbnbproject.controller;
+import com.example.airbnbproject.entity.Transaction;
 import com.example.airbnbproject.repository.PurchaseRepository;
 
 
 import com.example.airbnbproject.repository.ProductRepository;
 import com.example.airbnbproject.repository.PurchaseRepository;
+import com.example.airbnbproject.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,6 +22,9 @@ public class DashboardController {
 
     @Autowired
     private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository; // Ye line add karein
 
     @GetMapping
     public Map<String, Object> getStats() {
@@ -36,6 +42,11 @@ public class DashboardController {
         stats.put("totalPurchases", totalPurchases);
 
         return stats;
+    }
+
+    @GetMapping("/transactions")
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
     }
 }
 
