@@ -1,14 +1,12 @@
-# JDK 17 ka stable version use kar rahe hain
-FROM eclipse-temurin:17-jdk-alpine
-
-# Application folder create karna
+# Step 1: Build stage (Maven use karke JAR banayenge)
+FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Aapki build ki hui jar file ko container mein copy karna
-COPY target/*.jar app.jar
-
-# Spring Boot ka default port 8080 open karna
+# Step 2: Run stage (JDK use karke application chalayenge)
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Application start karne ki command
 ENTRYPOINT ["java", "-jar", "app.jar"]
