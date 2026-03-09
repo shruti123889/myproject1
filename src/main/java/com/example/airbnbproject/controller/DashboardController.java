@@ -1,19 +1,18 @@
 package com.example.airbnbproject.controller;
+
 import com.example.airbnbproject.entity.Transaction;
-import com.example.airbnbproject.repository.PurchaseRepository;
-
-
 import com.example.airbnbproject.repository.ProductRepository;
 import com.example.airbnbproject.repository.PurchaseRepository;
 import com.example.airbnbproject.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/stats")
+@RequestMapping("/api") // Base path /api rakha hai
 @CrossOrigin(origins = "*")
 public class DashboardController {
 
@@ -24,14 +23,20 @@ public class DashboardController {
     private PurchaseRepository purchaseRepository;
 
     @Autowired
-    private TransactionRepository transactionRepository; // Ye line add karein
+    private TransactionRepository transactionRepository;
 
-    @GetMapping
+    @GetMapping("/stats")
     public Map<String, Object> getStats() {
-        // Database se asli numbers nikalna
         long totalProducts = productRepository.count();
+
         Integer totalQuantity = productRepository.findAll().stream()
-                .mapToInt(p -> p.getQuantity()) // Yahan se '!= null' wala part hata dein
+                .mapToInt(p -> {
+                    try {
+                        return p.getQuantity(); // Agar quantity int hai to seedha return karein
+                    } catch (Exception e) {
+                        return 0; // Agar koi error aaye to 0 maan lein
+                    }
+                })
                 .sum();
 
         long totalPurchases = purchaseRepository.count();
@@ -49,4 +54,3 @@ public class DashboardController {
         return transactionRepository.findAll();
     }
 }
-
