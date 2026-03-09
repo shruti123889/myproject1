@@ -21,10 +21,8 @@ import org.springframework.http.HttpMethod;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Autowired
     private JwtFilter jwtFilter; // Aapki existing JwtFilter class
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -38,32 +36,26 @@ public class SecurityConfig {
                         .requestMatchers("/stats/**").permitAll()
 
                         .anyRequest().authenticated()
-                )
-                // JWT filter ko add karna mat bhoolna agar login use kar rahe ho
+                )// JWT filter ko add karna mat bhoolna agar login use kar rahe ho
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
+        return http.build();}
     // 1. Password Encoder Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     // 2. Authentication Manager Bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
-
-    // 3. CORS Configuration
+    }// 3. CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // Railway deployment ke liye best hai
+        // "*" ki jagah exact URL dena zyada safe hai
+        config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5500"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -11,7 +11,7 @@ import com.example.airbnbproject.dto.ProductRequestDto;
 import com.example.airbnbproject.dto.ProductDto;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://127.0.0.1:5500", allowCredentials = "true")
 @RestController
 @RequestMapping("/products")
 public class ProductController { @Autowired
