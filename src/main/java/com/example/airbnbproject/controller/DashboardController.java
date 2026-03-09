@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/") // Base path /api rakha hai
+@RequestMapping("/")
 @CrossOrigin(origins = "*")
 public class DashboardController {
 
@@ -20,8 +20,8 @@ public class DashboardController {
     private ProductRepository productRepository;
 
     @Autowired
-
     private PurchaseRepository purchaseRepository;
+
     @Autowired
     private TransactionRepository transactionRepository;
 
@@ -29,14 +29,9 @@ public class DashboardController {
     public Map<String, Object> getStats() {
         long totalProducts = productRepository.count();
 
+        // Sahi Lambda logic bina kisi error ke
         Integer totalQuantity = productRepository.findAll().stream()
-                .mapToInt(p -> {
-                    try {
-                        return p.getQuantity(); // Agar quantity int hai to seedha return karein
-                    } catch (Exception e) {
-                        return 0; // Agar koi error aaye to 0 maan lein
-                    }
-                })
+                .mapToInt(p -> p.getQuantity())
                 .sum();
 
         long totalPurchases = purchaseRepository.count();
