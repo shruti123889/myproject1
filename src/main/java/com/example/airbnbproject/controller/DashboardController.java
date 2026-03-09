@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/") // Base path /api rakha hai
+@RequestMapping("/products") // Base path /api rakha hai
 @CrossOrigin(origins = "*")
 public class DashboardController {
 
