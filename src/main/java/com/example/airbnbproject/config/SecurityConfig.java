@@ -37,7 +37,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/*", "/products/", "/stats/*").permitAll() // Dashboard stats allow kiya
+                        // DHAYAN DEIN: "/stats/**" mein double asterisk zaroori hai
+                        .requestMatchers("/auth/*", "/products/", "/stats/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -49,11 +50,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Origins: Aapka local aur Render ka pattern allow karega
+        // Origins update: Taki Render aur Localhost dono chalein
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://127.0.0.1:5500",
                 "http://localhost:5500",
-                "https://*.onrender.com" // Isse Render ke saare links allow ho jayenge
+                "https://*.onrender.com"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

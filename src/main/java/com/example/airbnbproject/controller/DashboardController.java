@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Long.sum;
+
 @RestController
 @RequestMapping("/stats")
 @CrossOrigin(origins = "*")
@@ -29,9 +31,10 @@ public class DashboardController {
     public Map<String, Object> getStats() {
         long totalProducts = productRepository.count();
 
-        // Sahi Lambda logic bina kisi error ke
-        Integer totalQuantity = productRepository.findAll().stream()
-                .mapToInt(p -> p.getQuantity())
+        // Yahan Integer (Wrapper class) use karein ya direct check hatayein
+        // Kyunki primitive int null nahi ho sakta
+        int totalQuantity = productRepository.findAll().stream()
+                .mapToInt(p -> p.getQuantity()) // Agar entity mein int hai toh null check ki zaroorat nahi
                 .sum();
 
         long totalPurchases = purchaseRepository.count();
