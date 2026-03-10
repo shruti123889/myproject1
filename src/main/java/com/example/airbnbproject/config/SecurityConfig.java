@@ -30,6 +30,8 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -45,6 +47,9 @@ public class SecurityConfig {
                 .build();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();}
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
