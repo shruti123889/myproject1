@@ -3,6 +3,7 @@ package com.example.airbnbproject.controller;
 import com.example.airbnbproject.entity.Transaction;
 import com.example.airbnbproject.repository.ProductRepository;
 import com.example.airbnbproject.repository.PurchaseRepository;
+import com.example.airbnbproject.repository.SaleRepository;
 import com.example.airbnbproject.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.Map;
 import static java.lang.Long.sum;
 
 @RestController
-@RequestMapping("/stats")
+@RequestMapping("/products")
 @CrossOrigin(origins = "*")
 public class DashboardController {
 
@@ -27,22 +28,27 @@ public class DashboardController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private SaleRepository saleRepository; // Ye line add karein
+
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
+        // 1. Database se counts nikaalein
         long totalProducts = productRepository.count();
+        long totalPurchases = purchaseRepository.count();
+        long totalSales = saleRepository.count(); // Naya count
 
-        // Yahan Integer (Wrapper class) use karein ya direct check hatayein
-        // Kyunki primitive int null nahi ho sakta
-        int totalQuantity = productRepository.findAll().stream()
-                .mapToInt(p -> p.getQuantity()) // Agar entity mein int hai toh null check ki zaroorat nahi
+        // 2. Total Quantity ka logic (Jo aapne pehle likha tha)
+        Integer totalQuantity = productRepository.findAll().stream()
+                .mapToInt(p -> p.getQuantity())
                 .sum();
 
-        long totalPurchases = purchaseRepository.count();
-
+        // 3. Map mein data bharein
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalProducts", totalProducts);
         stats.put("totalQuantity", totalQuantity);
         stats.put("totalPurchases", totalPurchases);
+        stats.put("totalSales", totalSales); // Frontend ko bhejane ke liye
 
         return stats;
     }
