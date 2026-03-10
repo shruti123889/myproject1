@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -34,14 +35,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS ko connect kiya
+                // 1. CORS ko yahan connect karna compulsory hai
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Sabse pehle OPTIONS (Preflight) requests ko allow karein
+                        // 2. Browser ki Preflight (OPTIONS) request ko allow karein
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 2. Public endpoints ko allow karein
-                        .requestMatchers("/auth/*", "/products/", "/stats/*").permitAll()
-                        // 3. Baaki sab ke liye authentication zaroori hai
+                        // 3. Exact paths aur patterns dono allow karein
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/products", "/products/**").permitAll()
+                        .requestMatchers("/stats", "/stats/**").permitAll() // Dono add kiye hain security ke liye
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -52,18 +55,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        // Frontend ke dono URLs allow karein (Slash ke bina)
-        config.setAllowedOrigins(Arrays.asList(
-                "http://127.0.0.1:5500",
-                "http://localhost:5500",
-                "http://localhost:8080"
-        ));
-
+        // Frontend origin ekdum sahi format mein
+        config.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
-        config.setMaxAge(3600L); // Preflight response ko 1 hour tak cache karein
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
