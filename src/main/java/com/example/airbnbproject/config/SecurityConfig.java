@@ -66,31 +66,27 @@ public class SecurityConfig {
     // CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(Arrays.asList(
+        // 1. Origins: Localhost aur "Allow All" patterns ke liye
+        config.setAllowedOriginPatterns(Arrays.asList(
                 "http://127.0.0.1:5500",
-                "http://localhost:5500"
+                "http://localhost:5500",
+                "https://*.onrender.com" // Isse aapka Render ka frontend automatically allow ho jayega
         ));
 
-        config.setAllowedMethods(Arrays.asList(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-        ));
+        // 2. Methods: Sabhi common request types allow karein
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
+        // 3. Headers: Sabhi headers allow karein (JWT ke liye zaroori hai)
         config.setAllowedHeaders(Arrays.asList("*"));
 
+        // 4. Credentials: Agar aap JWT ya Sessions use kar rahe hain
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**", config);
 
         return source;
     }
-
 }
