@@ -25,14 +25,17 @@ public class JwtFilter extends OncePerRequestFilter {
     }// ✅ Yaha sirf public endpoints define karo
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getServletPath();
-        return path.startsWith("/auth/") ||
-                path.startsWith("/customers") ||  // Yahan se aakhri ka slash hata dein
-                path.startsWith("/products") ||
-                path.startsWith("/orders") ||
-                path.startsWith("/sales");
 
-    }@Override
+        String path = request.getServletPath();
+
+        return path.startsWith("/auth/") ||
+                path.startsWith("/products") ||
+                path.startsWith("/purchase") ||
+                path.startsWith("/sales") ||
+                path.startsWith("/stats") ||
+                path.startsWith("/customers");
+    }
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
