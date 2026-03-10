@@ -19,8 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -35,16 +33,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                // 1. CORS ko yahan connect karna compulsory hai
+                // 1. CORS ko connect karna compulsory hai
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 2. Browser ki Preflight (OPTIONS) request ko allow karein
+                        // 2. Preflight (OPTIONS) requests ko har haal mein allow karein
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 3. Exact paths aur patterns dono allow karein
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/products", "/products/**").permitAll()
-                        .requestMatchers("/stats", "/stats/**").permitAll() // Dono add kiye hain security ke liye
+                        // 3. Sabhi public paths ko permitAll karein
+                        .requestMatchers("/auth/*", "/stats", "/stats/", "/products", "/products/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -55,8 +51,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Frontend origin ekdum sahi format mein
-        config.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
+
+        // 4. Render par test karne ke liye saare origins allow kar rahe hain temporary
+        // Taaki 403 ka issue solve ho jaye
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
@@ -65,14 +63,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
 }
+
+
