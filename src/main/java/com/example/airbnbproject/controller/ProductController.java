@@ -44,10 +44,12 @@ public class ProductController { @Autowired
         return dto;}
     @GetMapping
     public Page<ProductDto> getProducts(
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam(required = false) String name) {
-        return productService.getProducts(page, size, name);}
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name
+    ) {
+        return productService.getProducts(page, size, name);
+    }
     @GetMapping("/")
     public String home() {
         return "Backend is running successfully 🚀";
