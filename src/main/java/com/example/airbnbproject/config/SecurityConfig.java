@@ -31,14 +31,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                // 1. CORS ko enable karein jo niche wale bean se connect hoga
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // DHAYAN DEIN: "/stats/**" mein double asterisk zaroori hai
-                        .requestMatchers("/auth/*", "/products/", "/stats/**").permitAll()
+                        // 2. Sabhi OPTIONS requests ko allow karein (CORS ke liye zaroori hai)
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/auth/*", "/products/", "/stats/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
     @Bean
@@ -48,7 +51,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://127.0.0.1:5500",
                 "http://localhost:5500",
-                "https://*.onrender.com"
+                "https://myproject1-1-bym0.onrender.com"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "*"));
