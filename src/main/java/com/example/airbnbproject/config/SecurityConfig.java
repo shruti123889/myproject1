@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // DHAYAN DEIN: "/stats/**" mein double asterisk zaroori hai
-                        .requestMatchers("/auth/*", "/products/", "/stats/*").permitAll()
+                        .requestMatchers("/auth/*", "/products/", "/stats/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
