@@ -1,16 +1,16 @@
 package com.example.airbnbproject.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PurchaseRequestDto {
     private Long productId;
+    private Long vendorId;
     private int quantity;
-    private double unitCost;
+    private double purchasePrice;
 
-    // Getters and Setters
-    public Long getProductId() { return productId; }
-    public void setProductId(Long productId) { this.productId = productId; }
-
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-
-    public double getUnitCost() { return unitCost; }
-    public void setUnitCost(double unitCost) { this.unitCost = unitCost; }
 }

@@ -1,7 +1,10 @@
 package com.example.airbnbproject.entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "transactions")
@@ -19,6 +22,9 @@ public class Transaction {
     private TransactionType type; // CREDIT ya DEBIT
 
     private LocalDateTime transactionDate;
+
+    public void setTransactionDate(LocalDate now) {
+    }
 
     public enum TransactionType {
         CREDIT, DEBIT

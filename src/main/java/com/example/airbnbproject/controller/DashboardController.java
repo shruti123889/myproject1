@@ -2,10 +2,7 @@ package com.example.airbnbproject.controller;
 
 import com.example.airbnbproject.entity.Product;
 import com.example.airbnbproject.entity.Transaction;
-import com.example.airbnbproject.repository.ProductRepository;
-import com.example.airbnbproject.repository.PurchaseRepository;
-import com.example.airbnbproject.repository.SaleRepository;
-import com.example.airbnbproject.repository.TransactionRepository;
+import com.example.airbnbproject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,39 +13,44 @@ import java.util.Map;
 import static java.lang.Long.sum;
 
 @RestController
-@RequestMapping("/products")
-@CrossOrigin(origins = "*")
+@RequestMapping("/dashboard") // Prefix add karna achha hota hai
+@CrossOrigin("*")
 public class DashboardController {
 
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private PurchaseRepository purchaseRepository;
-
     @Autowired
     private SaleRepository saleRepository;
-
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private AccountRepository accountRepository; // Financial data ke liye
 
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        // Direct counts from repositories
+        // 1. Basic Counts
         stats.put("totalProducts", productRepository.count());
         stats.put("totalPurchases", purchaseRepository.count());
         stats.put("totalSales", saleRepository.count());
         stats.put("totalTransactions", transactionRepository.count());
 
-        // Efficient way to get total quantity
-
-        Integer totalQuantity = productRepository.findAll()
-                .stream()
-                .mapToInt(Product::getQuantity) // Direct call, no null check needed for primitive int
+        // 2. Total Quantity Calculation (Efficient way)
+        Integer totalQuantity = productRepository.findAll().stream()
+                .mapToInt(product -> product.getQuantity())
                 .sum();
         stats.put("totalQuantity", totalQuantity);
+
+        // 3. Financial Stats (Account Repository se)
+        Double income = accountRepository.getTotalIncome();
+        Double expense = accountRepository.getTotalExpense();
+
+        stats.put("totalIncome", income != null ? income : 0.0);
+        stats.put("totalExpense", expense != null ? expense : 0.0);
+        stats.put("netProfit", (income != null ? income : 0.0) - (expense != null ? expense : 0.0));
 
         return stats;
     }

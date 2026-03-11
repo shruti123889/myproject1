@@ -40,4 +40,8 @@ public class Purchase {
     public void setCostPrice(Double costPrice) { this.costPrice = costPrice; }
     public LocalDateTime getPurchaseDate() { return purchaseDate; }
     public void setPurchaseDate(LocalDateTime purchaseDate) { this.purchaseDate = purchaseDate; }
+
+    public void setPurchasePrice(Double purchasePrice) {
+
+    }
 }

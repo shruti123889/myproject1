@@ -2,47 +2,72 @@ package com.example.airbnbproject.service.impl;
 
 import com.example.airbnbproject.entity.*;
 import com.example.airbnbproject.repository.*;
-import com.example.airbnbproject.service.PurchaseService; // Ye import bahut zaroori hai
+import com.example.airbnbproject.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
 
     @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
     private PurchaseRepository purchaseRepository;
+
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private VendorRepository vendorRepository;
 
-    @Override // Ye annotation lagayein
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Override
     @Transactional
-    public Purchase createPurchase(Long productId, Long vendorId, int quantity, double cost) {
+    public Purchase createPurchase(Long productId, Long vendorId, Integer quantity, Double purchasePrice) {
+        // 1. Check Product aur Vendor
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product nahi mila!"));
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor nahi mila!"));
 
+        // 2. Inventory Management (Stock badhana)
         product.setQuantity(product.getQuantity() + quantity);
         productRepository.save(product);
 
+        // 3. Purchase Record Save
         Purchase purchase = new Purchase();
         purchase.setProduct(product);
         purchase.setVendor(vendor);
         purchase.setQuantity(quantity);
-        purchase.setCostPrice(cost);
+        purchase.setPurchasePrice(purchasePrice);
+
+        // YAHAN FIX HAI: Ensure karein ki ye aapki Entity ke type se match kare
+        purchase.setPurchaseDate(java.time.LocalDateTime.now());
+
+
         Purchase savedPurchase = purchaseRepository.save(purchase);
 
-        // Transaction logic yahan method ke andar hona chahiye
-        Transaction transaction = new Transaction();
-        transaction.setAmount(cost * quantity);
-        transaction.setType(Transaction.TransactionType.DEBIT);
-        transaction.setDescription("Purchase of: " + product.getName());
-        transactionRepository.save(transaction);
+        // 4. Ledger Transaction
+        Transaction purchaseTrans = new Transaction();
+        purchaseTrans.setAmount(purchasePrice * quantity);
+        purchaseTrans.setDescription("Stock Purchase: " + product.getName());
+        purchaseTrans.setTransactionDate(LocalDate.now());
+        transactionRepository.save(purchaseTrans);
+
+        // 5. Account Expense Entry
+        Account accountEntry = Account.builder()
+                .transactionType("EXPENSE")
+                .amount(purchasePrice * quantity)
+                .description("Purchase from Vendor ID: " + vendorId)
+                .transactionDate(LocalDate.now())
+                .build();
+
+        accountRepository.save(accountEntry);
 
         return savedPurchase;
     }

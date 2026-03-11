@@ -16,4 +16,5 @@ public interface SaleService {
 
     void deleteSale(Long id);
     Sale updateSale(Long id, SaleRequest request);
+
 }
