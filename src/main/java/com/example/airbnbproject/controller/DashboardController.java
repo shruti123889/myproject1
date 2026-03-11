@@ -11,10 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.Long.sum;
-
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/dashboard") // Prefix add karna achha hota hai
-@CrossOrigin("*")
+@RequestMapping("/dashboard")
 public class DashboardController {
 
     @Autowired

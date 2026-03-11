@@ -15,5 +15,5 @@ public interface ProductService {
     Product updateProduct(Long id, ProductRequestDto dto);
     Product save(ProductRequestDto dto);
     Page<ProductDto> getProducts(int page, int size, String name);
-
+    List<ProductDto> getStockReport();
 }

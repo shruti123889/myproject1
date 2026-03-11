@@ -6,7 +6,7 @@ import com.example.airbnbproject.dto.SaleRequest; // Step 1 wali class import ka
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/sales")
 public class SaleController {
