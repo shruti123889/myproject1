@@ -30,18 +30,15 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
-                // 1. CORS ko link karna sabse zaroori hai (Line 30 fix)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(request -> request
-                        // 2. Dashboard stats aur products ko bina token ke permit karein
-                        .requestMatchers("/login", "/register", "/products/**").permitAll()
-                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable()) // CSRF ko disable hi rehne dein login ke liye
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS link karna zaroori hai
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/*", "/products/*").permitAll() // Pure /auth/ path ko allow karein
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -49,12 +46,21 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();}
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // 3. Frontend origins ko explicitly allow karein
-        config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5500"));
+
+        // Origins mein '*' tabhi chalta hai jab allowCredentials false ho
+        // Agar credentials true chahiye, toh exact URLs dene hote hain
+        config.setAllowedOrigins(List.of(
+                "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "null" // Ye un logon ke liye jo file direct open karte hain
+        ));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
@@ -62,18 +68,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-        provider.setUserDetailsService(userDetailsService);
-        return provider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 }
