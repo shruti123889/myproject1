@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.airbnbproject.exception.ProductNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.example.airbnbproject.dto.ProductRequestDto;
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -72,5 +74,29 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(dto.getPrice());
         product.setQuantity(dto.getQuantity());
         return productRepository.save(product);
+    }
+    public List<ProductDto> getStockReport() {
+        return productRepository.findAll().stream().map(product -> {
+            ProductDto dto = new ProductDto();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setPrice(product.getPrice());
+            dto.setQuantity(product.getQuantity());
+
+            // Logic: Total Value
+            dto.setTotalStockValue(product.getPrice() * product.getQuantity());
+
+            // Logic: Status Alert
+            if (product.getQuantity() <= 0) {
+                dto.setStatus("Out of Stock");
+            } else if (product.getQuantity() <= 10) {
+                dto.setStatus("Low Stock");
+            } else {
+                dto.setStatus("In Stock");
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+
     }
 }

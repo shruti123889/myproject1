@@ -54,4 +54,9 @@ public class ProductController { @Autowired
     public String home() {
         return "Backend is running successfully 🚀";
     }
+
+    @GetMapping("/stock-report")
+    public ResponseEntity<List<ProductDto>> getStockReport() {
+        return ResponseEntity.ok(productService.getStockReport());
+    }
 }

@@ -52,6 +52,11 @@ public class DashboardController {
         stats.put("totalExpense", expense != null ? expense : 0.0);
         stats.put("netProfit", (income != null ? income : 0.0) - (expense != null ? expense : 0.0));
 
+        // NEW: Low Stock Alert Logic (Threshold = 10 units)
+        List<Product> lowStockItems = productRepository.findLowStockProducts(10);
+        stats.put("lowStockProducts", lowStockItems);
+        stats.put("lowStockCount", lowStockItems.size());
+
         return stats;
     }
 
