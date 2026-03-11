@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF ko disable hi rehne dein login ke liye
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS link karna zaroori hai
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/*", "/products/*").permitAll() // Pure /auth/ path ko allow karein
+                        .requestMatchers("/auth/**", "/register","/login","/products/*").permitAll() // Pure /auth/ path ko allow karein
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
