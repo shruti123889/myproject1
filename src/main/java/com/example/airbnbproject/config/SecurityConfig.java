@@ -33,9 +33,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // CSRF ko disable hi rehne dein login ke liye
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS link karna zaroori hai
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()// CSRF ko disable hi rehne dein login ke liye
                         .requestMatchers("/auth/**", "/register","/login","/products/*").permitAll() // Pure /auth/ path ko allow karein
                         .anyRequest().authenticated()
                 )
