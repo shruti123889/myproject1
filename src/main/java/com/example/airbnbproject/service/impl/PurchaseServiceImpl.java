@@ -32,12 +32,16 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 1. Check Product aur Vendor
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product nahi mila!"));
-        Vendor vendor = vendorRepository.findById(vendorId).orElse(null);
-        if (vendor == null) {
-            vendor = new Vendor();
-            vendor.setId(1L);
-            vendor.setName("Dummy Vendor");
-        }
+
+// Vendor dhundo, agar nahi mile to naya banao aur SAVE karo
+        Vendor vendor = vendorRepository.findById(vendorId).orElseGet(() -> {
+            Vendor newVendor = new Vendor();
+            newVendor.setName("Dummy Vendor");
+            newVendor.setContact("0000000000");
+            newVendor.setAddress("Default Address");
+            return vendorRepository.save(newVendor); // Database mein save karna zaroori hai
+        });
+
         // 2. Inventory Management (Stock badhana)
         product.setQuantity(product.getQuantity() + quantity);
         productRepository.save(product);
