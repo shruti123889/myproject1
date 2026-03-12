@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sales")
 public class SaleController {
-
     @Autowired
     private SaleService saleService;
-
     // 1. Create Sale (Jo aapke paas pehle se tha)
     @PostMapping("/create")
     public ResponseEntity<?> createSale(@RequestBody SaleRequest request) {
@@ -27,9 +25,7 @@ public class SaleController {
             return ResponseEntity.ok(sale);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-    // 2. Get All Sales (Sari sales dekhne ke liye)
+        }}// 2. Get All Sales (Sari sales dekhne ke liye)
     @GetMapping
     public ResponseEntity<List<Sale>> getAllSales() {
         return ResponseEntity.ok(saleService.getAllSales());
@@ -40,9 +36,7 @@ public class SaleController {
         return saleService.getSaleById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/{id}")
+    }@PutMapping("/{id}")
     public ResponseEntity<?> updateSale(@PathVariable Long id, @RequestBody SaleRequest request) {
         try {
             Sale updatedSale = saleService.updateSale(id, request);
@@ -50,8 +44,7 @@ public class SaleController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-    // 4. Delete Sale
+    }// 4. Delete Sale
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSale(@PathVariable Long id) {
         try {

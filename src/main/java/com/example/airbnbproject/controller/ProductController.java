@@ -17,10 +17,9 @@ import org.springframework.data.domain.Page;
 public class ProductController { @Autowired
     private ProductService productService;
     @PostMapping
-    public Product saveProduct(
-            @Valid @RequestBody ProductRequestDto productDto) {
-        return productService.save(productDto);}
-
+    public Product saveProduct(@Valid @RequestBody ProductRequestDto productRequestDto) {
+        return productService.save(productRequestDto);
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
@@ -49,12 +48,10 @@ public class ProductController { @Autowired
             @RequestParam(required = false) String name
     ) {
         return productService.getProducts(page, size, name);
-    }
-    @GetMapping("/")
+    }@GetMapping("/")
     public String home() {
         return "Backend is running successfully 🚀";
     }
-
     @GetMapping("/stock-report")
     public ResponseEntity<List<ProductDto>> getStockReport() {
         return ResponseEntity.ok(productService.getStockReport());
