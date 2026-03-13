@@ -15,76 +15,40 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sales")
 public class SaleController {
-
     @Autowired
     private SaleService saleService;
-
-    // Create Sale
     @PostMapping("/saveSale")
     public ResponseEntity<?> createSale(@RequestBody SaleRequest request) {
-        try {
-
-            Sale sale = saleService.createSale(
+        try {Sale sale = saleService.createSale(
                     request.getProductId(),
                     request.getCustomerId(),
                     request.getQuantity(),
                     request.getPrice()
-            );
-
-            return ResponseEntity.ok(sale);
-
-        } catch (Exception e) {
-
-            Map<String, String> errorResponse = new HashMap<>();
+            );return ResponseEntity.ok(sale);
+        } catch (Exception e) {Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", e.getMessage());
-
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-    }
-
+            return ResponseEntity.badRequest().body(errorResponse);}}
     // Get All Sales
     @GetMapping
     public ResponseEntity<List<Sale>> getAllSales() {
-        return ResponseEntity.ok(saleService.getAllSales());
-    }
-
+        return ResponseEntity.ok(saleService.getAllSales());}
     // Get Sale By ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getSaleById(@PathVariable Long id) {
-
         return saleService.getSaleById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Update Sale
+                .orElse(ResponseEntity.notFound().build());}
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSale(@PathVariable Long id, @RequestBody SaleRequest request) {
-
-        try {
-
-            Sale updatedSale = saleService.updateSale(id, request);
-
-            return ResponseEntity.ok(updatedSale);
-
-        } catch (Exception e) {
-
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // Delete Sale
+    public ResponseEntity<?> updateSale(@PathVariable Long id, @RequestBody SaleRequest request) {try {
+        Sale updatedSale = saleService.updateSale(id, request);
+        return ResponseEntity.ok(updatedSale);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());}}
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSale(@PathVariable Long id) {
-
-        try {
-
-            saleService.deleteSale(id);
-
+        try {saleService.deleteSale(id);
             return ResponseEntity.ok("Sale deleted successfully with ID: " + id);
-
         } catch (Exception e) {
-
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
