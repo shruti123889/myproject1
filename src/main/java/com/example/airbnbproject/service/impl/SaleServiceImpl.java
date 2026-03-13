@@ -44,21 +44,18 @@ public class SaleServiceImpl implements SaleService {
         // 2. Stock update aur Sale save karna
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
-
         Sale sale = new Sale();
         sale.setProduct(product);
         sale.setCustomer(customer);
         sale.setQuantity(quantity);
         sale.setSalePrice(price);
         Sale savedSale = saleRepository.save(sale);
-
         // 3. Transaction Record save karna
         Transaction saleTransaction = new Transaction();
         saleTransaction.setAmount(price * quantity);
         saleTransaction.setDescription("Sale of: " + product.getName() + " (Qty: " + quantity + ")");
         saleTransaction.setTransactionDate(LocalDate.now());
         transactionRepository.save(saleTransaction);
-
         // 4. Account Table mein Income Entry (Sahi logic)
         Account accountEntry = Account.builder()
                 .transactionType("INCOME")
@@ -66,7 +63,6 @@ public class SaleServiceImpl implements SaleService {
                 .description("Revenue from Sale ID: " + savedSale.getId())
                 .transactionDate(LocalDate.now())
                 .build();
-
         // Yahan ab error nahi aayega kyunki humne upar accountRepository ko sahi kar diya hai
         accountRepository.save(accountEntry);
         return savedSale;
