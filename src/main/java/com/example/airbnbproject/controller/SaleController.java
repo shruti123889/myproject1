@@ -18,7 +18,7 @@ public class SaleController {
     //redeploy trigger
     @Autowired
     private SaleService saleService;
-    @PostMapping("/saveSale")
+    @PostMapping
     public ResponseEntity<?> createSale(@RequestBody SaleRequest request) {
         try {Sale sale = saleService.createSale(
                     request.getProductId(),
