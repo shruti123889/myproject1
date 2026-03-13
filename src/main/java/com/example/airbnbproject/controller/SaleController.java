@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sales")
 public class SaleController {
+    //redeploy trigger
     @Autowired
     private SaleService saleService;
     @PostMapping("/saveSale")
