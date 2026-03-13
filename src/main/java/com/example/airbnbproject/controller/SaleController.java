@@ -1,5 +1,8 @@
 package com.example.airbnbproject.controller;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.example.airbnbproject.entity.Sale;
 import com.example.airbnbproject.service.SaleService;
 import com.example.airbnbproject.dto.SaleRequest; // Step 1 wali class import karein
@@ -13,6 +16,7 @@ public class SaleController {
     @Autowired
     private SaleService saleService;
     // 1. Create Sale (Jo aapke paas pehle se tha)
+
     @PostMapping("/create")
     public ResponseEntity<?> createSale(@RequestBody SaleRequest request) {
         try {
@@ -24,8 +28,14 @@ public class SaleController {
             );
             return ResponseEntity.ok(sale);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }}// 2. Get All Sales (Sari sales dekhne ke liye)
+            // Yahan Map ka use kiya hai takki response JSON ban jaye
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    // 2. Get All Sales (Sari sales dekhne ke liye)
     @GetMapping
     public ResponseEntity<List<Sale>> getAllSales() {
         return ResponseEntity.ok(saleService.getAllSales());

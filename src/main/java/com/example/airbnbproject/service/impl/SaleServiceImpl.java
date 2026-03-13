@@ -41,7 +41,6 @@ public class SaleServiceImpl implements SaleService {
         if (product.getQuantity() < quantity) {
             throw new RuntimeException("Stock kam hai! Sirf " + product.getQuantity() + " bache hain.");
         }
-
         // 2. Stock update aur Sale save karna
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
@@ -70,7 +69,6 @@ public class SaleServiceImpl implements SaleService {
 
         // Yahan ab error nahi aayega kyunki humne upar accountRepository ko sahi kar diya hai
         accountRepository.save(accountEntry);
-
         return savedSale;
     }
 
