@@ -17,7 +17,7 @@ public class SaleController {
     private SaleService saleService;
     // 1. Create Sale (Jo aapke paas pehle se tha)
 
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createSale(@RequestBody SaleRequest request) {
         try {
             Sale sale = saleService.createSale(
